@@ -32,9 +32,9 @@ class CoCo
      */
     public static function run()
     {
-        $default_module = self::$_instance->config['default_module'] ? self::$_instance->config['default_module'] : 'Home';
-        $default_controller = self::$_instance->config['default_controller'] ? self::$_instance->config['default_controller'] : 'Index';
-        $default_action = self::$_instance->config['default_action'] ? self::$_instance->config['default_action'] : 'Index';
+        $default_module     = !empty(self::$_instance->config['default_module'])        ? self::$_instance->config['default_module']        : 'Home';
+        $default_controller = !empty(self::$_instance->config['default_controller'])    ? self::$_instance->config['default_controller']    : 'Index';
+        $default_action     = !empty(self::$_instance->config['default_action'])        ? self::$_instance->config['default_action']        : 'Index';
 
         //普通url模式访问 ?m=home&c=index&a=index&id=12312
         $request['module'] = !empty($_GET['m']) ? ucfirst($_GET['m']) : $default_module;
