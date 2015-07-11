@@ -4,20 +4,17 @@ class DB extends PDO{
 	private static $_db;
 	
 	public function __construct($db = null,$options = null){
-		//$dsn = 'mysql:host=localhost;port=6379;dbname=blog';
+		//$dsn = 'mysql:host=localhost;port=3306;dbname=blog';
 		if(is_null($db)){
 			$db = CoCo::app()->config['db'];
 		}
 
 		//默认端口
 		if(empty($db['port'])){
-			$dsn = $db['type'].':host='.$db['host'].';dbname='.$db['dbName'];	
+			$dsn = $db['type'].':host='.$db['host'].';dbname='.$db['dbname'];	
 		}else{
-			$dsn = $db['type'].':host='.$db['host'].';port='.$db['port'].';dbname='.$db['dbName'];
+			$dsn = $db['type'].':host='.$db['host'].';port='.$db['port'].';dbname='.$db['dbname'];
 		}
-		
-		$username = $db['user'];
-		$password = $db['password'];
 
 		if(is_null($options)){
 			$options = array(
@@ -28,7 +25,7 @@ class DB extends PDO{
         	);	
 		}
 		
-		parent::__construct($dsn,$username,$password,$options);
+		parent::__construct($dsn,$db['user'],$db['password'],$options);
 	}
 
 	public static function model($db = null,$options = null){

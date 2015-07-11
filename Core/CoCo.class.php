@@ -2,20 +2,23 @@
 
 /**
  * CoCo核心类
- * @author Tang
+ * @author TTT
  * @date 2015-03-11
+ * @lastUpdateTime 2015-07-11
  */
 class CoCo
 {
-    protected static $_instance;
-    public $config;    //配置
-    public $module;    //模块
+    protected static $_instance;    //类实例
+    public $config;                 //配置
+    public $module;                 //模块
 
     public function __construct($configFile)
     {
         if (!is_null($configFile)) {
             //加载配置文件
             $this->config = require($configFile);
+            $this->config['app_path'] = APP_PATH;
+            $GLOBALS['CoCo_required_config'][] = $configFile;
         }
     }
 
@@ -32,14 +35,14 @@ class CoCo
      */
     public static function run()
     {
-        $default_module     = !empty(self::$_instance->config['default_module'])        ? self::$_instance->config['default_module']        : 'Home';
+        $default_module     = !empty(self::$_instance->config['default_module'])        ? self::$_instance->config['default_module']        : 'Index';
         $default_controller = !empty(self::$_instance->config['default_controller'])    ? self::$_instance->config['default_controller']    : 'Index';
         $default_action     = !empty(self::$_instance->config['default_action'])        ? self::$_instance->config['default_action']        : 'Index';
 
         //普通url模式访问 ?m=home&c=index&a=index&id=12312
-        $request['module'] = !empty($_GET['m']) ? ucfirst($_GET['m']) : $default_module;
-        $request['controller'] = !empty($_GET['c']) ? ucfirst($_GET['c']) : $default_controller;
-        $request['action'] = 'action' . (!empty($_GET['a']) ? ucfirst($_GET['a']) : $default_action);
+        $request['module']      = !empty($_GET['m'])                ? ucfirst($_GET['m']) : $default_module;
+        $request['controller']  = !empty($_GET['c'])                ? ucfirst($_GET['c']) : $default_controller;
+        $request['action']      = 'action' . (!empty($_GET['a'])    ? ucfirst($_GET['a']) : $default_action);
 
         /*unset($_GET['m']);
         unset($_GET['c']);
@@ -61,27 +64,14 @@ class CoCo
 
         //检查是否存在此action方法
         if (!method_exists($controller_obj, $action)) {
-            die(PHP_EOL . $request['module'] . '模块下' . get_class($controller_obj) . '不存在' . $action . "方法!");
+            Debug::dieMsg($request['module'] . '模块下' . get_class($controller_obj) . '类不存在' . $action . '方法!');
         }
 
         //调用action
         $controller_obj->$action();
 
         //运行结束时间
-        $GLOBALS['_endTime'] = microtime(TRUE);
-
-        $GLOBALS['debug_info']['run_time'] = '脚本运行时间 ： ' . ($GLOBALS['_endTime'] - $GLOBALS['_beginTime']) . ' 秒';
-
-        //显示DEBUG 信息
-        if (APP_DEBUG) {
-            echo '<div class="debug" style="border:1px dashed #ccc;padding:10px;background-color:#eee;font-size:13px;"><ul>';
-            if (!empty($GLOBALS['debug_info'])) {
-                foreach ($GLOBALS['debug_info'] as $value) {
-                    echo '<li>' . $value . '</li>';
-                }
-            }
-            echo '</ul></div>';
-        }
+        $GLOBALS['CoCo_endTime'] = microtime(TRUE);
     }
 
     /**
@@ -89,7 +79,6 @@ class CoCo
      */
     public static function autoload($className)
     {
-
         if (file_exists(CoCo_PATH . '/Core/' . $className . EXT)) {
             require_once CoCo_PATH . '/Core/' . $className . EXT;
         } else if (file_exists(CoCo_PATH . '/Lib/' . $className . EXT)) {
@@ -98,19 +87,21 @@ class CoCo
             //模块配置
             $module_config = array();
             $current_module = self::$_instance->module;
+            $default_config_file = !empty(self::$_instance->config['default_config_file']) ? self::$_instance->config['default_config_file'] : 'main.php';
 
             //如果存在模块配置
             if (in_array($current_module, self::$_instance->config['module'])) {
                 //加载模块配置文件
-                $module_config_file = (self::$_instance->config['app_name']) . DIRECTORY_SEPARATOR . (self::$_instance->module) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'main.php';
+                $module_config_file = (self::$_instance->config['app_path']) . DIRECTORY_SEPARATOR . (self::$_instance->module) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . $default_config_file;
                 if (file_exists($module_config_file)) {
                     //把每个模块的配置放入对应数组中
                     $module_config = require($module_config_file);
+                    $GLOBALS['CoCo_required_config'][] = $module_config_file;
                 }
             }
 
             //加入module_path
-            $module_config['module_path'] = (self::$_instance->config['app_name']) . DIRECTORY_SEPARATOR . (self::$_instance->module);
+            $module_config['module_path'] = (self::$_instance->config['app_path']) . DIRECTORY_SEPARATOR . (self::$_instance->module);
 
             //同步配置到全局配置中
             self::$_instance->config['module_config'][$current_module] = $module_config;
@@ -129,10 +120,9 @@ class CoCo
                     }
                 }
             }
-
             //class文件未找到
             if ($bool === false) {
-                die(PHP_EOL . $module_config['module_path'] . '模块下' . $className . "类不存在!");
+                Debug::dieMsg($module_config['module_path'] . '模块下' . $className . "类不存在!");
             }
         }
     }

@@ -5,7 +5,7 @@
  */
 class CoController{
 
-    protected $layout = '/main';    //布局文件 默认mian`
+    protected $layout = '/main';    //布局文件 默认mian
     protected $title = '';
     protected $controller;          //当前控制器
     protected $module;              //当前模块
@@ -32,11 +32,12 @@ class CoController{
         $view_dir = $module_path.DIRECTORY_SEPARATOR.'view';
 
         //渲染参数
-        if(!empty($data)){
+        /*if(!empty($data)){
             foreach($data as $k=>$v){
                 $$k = $v;
             }
-        }
+        }*/
+        extract($data);
 
         //渲染页面
         if(!empty($view)){
@@ -50,12 +51,12 @@ class CoController{
      */
     public function render($view = '',$data = null){
 
-       
-
         $module = $this->module;
         $module_path = CoCo::app()->config['module_config'][$module]['module_path'];
         $view_dir = $module_path.DIRECTORY_SEPARATOR.'view';
         
+        $view_data = array();
+
         //渲染参数
         if(!empty($data)){
             foreach($data as $k=>$v){
@@ -175,7 +176,7 @@ class CoController{
      * 定义 title
      */
     public function setTitle(){
-
+        
     }
 
     /**

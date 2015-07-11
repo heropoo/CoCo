@@ -19,19 +19,21 @@ session_start();
 date_default_timezone_set('Asia/Shanghai');
 
 // 记录开始运行时间
-$GLOBALS['_beginTime'] 	=	microtime(TRUE);
+$GLOBALS['CoCo_beginTime']  =   microtime(TRUE);
+
+// 应用加载的配置文件
+$GLOBALS['CoCo_required_config'] = array(); 
 
 // 版本信息
-const CoCo_VERSION     	=   '0.2';
+const CoCo_VERSION      =   '0.2';
 // 类文件后缀
-const EXT              	=   '.class.php';
+const EXT               =   '.class.php';
 // 模板文件后缀
 const VEXT              =   '.php'; 
 
 // 系统常量定义
-defined('CoCo_PATH')   	or define('CoCo_PATH',     	__DIR__);
+defined('CoCo_PATH')    or define('CoCo_PATH',      __DIR__);
 defined('APP_PATH')     or define('APP_PATH',       dirname($_SERVER['SCRIPT_FILENAME']));
-//defined('APP_STATUS')   or define('APP_STATUS',     ''); // 应用状态 加载对应的配置文件
 defined('APP_DEBUG')    or define('APP_DEBUG',      false); // 是否调试模式
 
 // 加载核心CoCo类

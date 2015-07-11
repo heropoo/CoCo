@@ -21,7 +21,7 @@ class EDB{
 	private static $_instance;			//self实例
 
 	public function __construct($db = null,$options = null){
-		//$dsn = 'mysql:host=localhost;port=6379;dbname=blog';
+		//$dsn = 'mysql:host=localhost;port=3306;dbname=blog';
 		if(is_null($db)){
 			$db = CoCo::app()->config['db'];
 			$this->dbConfig = $db;
@@ -29,9 +29,9 @@ class EDB{
 
 		//默认端口
 		if(empty($this->dbConfig['port'])){
-			$dsn = $this->dbConfig['type'].':host='.$this->dbConfig['host'].';dbname='.$this->dbConfig['dbName'];	
+			$dsn = $this->dbConfig['type'].':host='.$this->dbConfig['host'].';dbname='.$this->dbConfig['dbname'];	
 		}else{
-			$dsn = $this->dbConfig['type'].':host='.$this->dbConfig['host'].';port='.$this->dbConfig['port'].';dbname='.$this->dbConfig['dbName'];
+			$dsn = $this->dbConfig['type'].':host='.$this->dbConfig['host'].';port='.$this->dbConfig['port'].';dbname='.$this->dbConfig['dbname'];
 		}
 
 		//$username = $this->dbConfig['user'];
