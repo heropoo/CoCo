@@ -5,7 +5,7 @@
  */
 class CoController{
 
-    protected $layout = '/main';    //布局文件 默认mian`
+    protected $layout = '/main';    //布局文件 默认mian
     protected $title = '';
     protected $controller;          //当前控制器
     protected $module;              //当前模块
@@ -32,11 +32,12 @@ class CoController{
         $view_dir = $module_path.DIRECTORY_SEPARATOR.'view';
 
         //渲染参数
-        if(!empty($data)){
+        /*if(!empty($data)){
             foreach($data as $k=>$v){
                 $$k = $v;
             }
-        }
+        }*/
+        extract($data);
 
         //渲染页面
         if(!empty($view)){
@@ -50,12 +51,12 @@ class CoController{
      */
     public function render($view = '',$data = null){
 
-       
-
         $module = $this->module;
         $module_path = CoCo::app()->config['module_config'][$module]['module_path'];
         $view_dir = $module_path.DIRECTORY_SEPARATOR.'view';
         
+        $view_data = array();
+
         //渲染参数
         if(!empty($data)){
             foreach($data as $k=>$v){
@@ -141,32 +142,65 @@ class CoController{
             return $url;
         }
 
-        $script_name = $_SERVER['SCRIPT_NAME'];
-        // /home/index/index
-        if(strpos($path,'/') === 0){
-            $arr = explode('/',ltrim($path,'/'));
-            if(count($arr) == 3){       //模块 + 控制器 + 方法
-                $url = $script_name.'?m='.$arr[0].'&c='.$arr[1].'&a='.$arr['2'];
-            }else if(count($arr) == 2){ //模块 + 控制器 + 默认方法
-                $url = $script_name.'?m='.$arr[0].'&c='.$arr[1];
-            }else if(count($arr) == 1){ //模块 + 默认控制器 + 默认方法
-                $url = $script_name.'?m='.$arr[0];
+        $router = !empty(CoCo::app()->config['router']) ? CoCo::app()->config['router'] : 'normal';
+
+        if($router == 'pathinfo'){  //pathinfo
+            // /home/index/index
+            if(strpos($path,'/') === 0){
+                $arr = explode('/',ltrim($path,'/'));
+                if(count($arr) == 3){       //模块 + 控制器 + 方法
+                    $url = '/'.$arr[0].'/'.$arr[1].'/'.$arr['2'];
+                }else if(count($arr) == 2){ //模块 + 控制器 + 默认方法
+                    $url = '/'.$arr[0].'/'.$arr[1].'/'.CoCo::app()->config['default_action'];
+                }else if(count($arr) == 1){ //模块 + 默认控制器 + 默认方法
+                    $url = '/'.$arr[0].'/'.CoCo::app()->config['default_controller'].'/'.CoCo::app()->config['default_action'];
+                } 
+            }else{
+                $arr = explode('/',$path);
+                if(count($arr) == 1){      //当前模块 + 当前控制器 + 方法
+                    $url = '/'.$this->module.'/'.$this->controller.'/'.$arr[0];
+                }else if(count($arr) == 2){//当前模块 + 控制器 + 方法
+                    $url = '/'.$this->module.'/'.$arr[0].'/'.$arr[1];
+                }else if(count($arr) == 3){//模块 + 控制器 + 方法
+                    $url = '/'.$arr[0].'/'.$arr[1].'/'.$arr[2];
+                }
             }
-        }else{
-            $arr = explode('/',$path);
-            if(count($arr) == 1){      //当前模块 + 当前控制器 + 方法
-                $url = $script_name.'?m='.$this->module.'&c='.$this->controller.'&a='.$arr[0];
-            }else if(count($arr) == 2){//当前模块 + 控制器 + 方法
-                $url = $script_name.'?m='.$this->module.'&c='.$arr[0].'&a='.$arr[1];
-            }else if(count($arr) == 3){//模块 + 控制器 + 方法
-                $url = $script_name.'?m='.$arr[0].'&c='.$arr[1].'&a='.$arr[2];
+            if(!empty($params)){
+                foreach($params as $k=>$v){
+                    $url .= "/$k/$v";
+                }
+            }   
+            if(!empty(CoCo::app()->config['url_suffix'])){
+                $url .= CoCo::app()->config['url_suffix'];
             }
-        }
-        
-        if(!empty($params)){
-            foreach($params as $k=>$v){
-                $url .= "&$k=$v";
+        }else{                      //normal
+            $script_name = $_SERVER['SCRIPT_NAME'];
+            // /home/index/index
+            if(strpos($path,'/') === 0){
+                $arr = explode('/',ltrim($path,'/'));
+                if(count($arr) == 3){       //模块 + 控制器 + 方法
+                    $url = $script_name.'?m='.$arr[0].'&c='.$arr[1].'&a='.$arr['2'];
+                }else if(count($arr) == 2){ //模块 + 控制器 + 默认方法
+                    $url = $script_name.'?m='.$arr[0].'&c='.$arr[1];
+                }else if(count($arr) == 1){ //模块 + 默认控制器 + 默认方法
+                    $url = $script_name.'?m='.$arr[0];
+                }
+            }else{
+                $arr = explode('/',$path);
+                if(count($arr) == 1){      //当前模块 + 当前控制器 + 方法
+                    $url = $script_name.'?m='.$this->module.'&c='.$this->controller.'&a='.$arr[0];
+                }else if(count($arr) == 2){//当前模块 + 控制器 + 方法
+                    $url = $script_name.'?m='.$this->module.'&c='.$arr[0].'&a='.$arr[1];
+                }else if(count($arr) == 3){//模块 + 控制器 + 方法
+                    $url = $script_name.'?m='.$arr[0].'&c='.$arr[1].'&a='.$arr[2];
+                }
             }
+            
+            if(!empty($params)){
+                foreach($params as $k=>$v){
+                    $url .= "&$k=$v";
+                }
+            }    
         }
         return $url;
     }
@@ -175,7 +209,7 @@ class CoController{
      * 定义 title
      */
     public function setTitle(){
-
+        
     }
 
     /**

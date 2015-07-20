@@ -29,7 +29,7 @@ class PDOModel{
                     'port'=>SAE_MYSQL_PORT,
                     'user'=>SAE_MYSQL_USER,
                     'password'=>SAE_MYSQL_PASS,
-                    'dbName'=>SAE_MYSQL_DB,
+                    'dbname'=>SAE_MYSQL_DB,
                     'tablePrefix'=>'tt_'
                 );
             }else{
@@ -49,7 +49,7 @@ class PDOModel{
                 );
             }
             
-            $this->plink = new PDO('mysql:host='.$db['host'].';port='.$db['port'].';dbname='.$db['dbName'],$db['user'],$db['password'],$options);
+            $this->plink = new PDO('mysql:host='.$db['host'].';port='.$db['port'].';dbname='.$db['dbname'],$db['user'],$db['password'],$options);
         }catch(Exception $e){
             echo '连接错误：'.$e->getMessage();
             exit;

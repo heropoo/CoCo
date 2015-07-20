@@ -9,7 +9,7 @@
  * @return mixed 
  * @author by Xiao 2014-12-10
  */
-function getQuery($key,$default_value = NULL){
+function getQuery($key,$default_value = null){
 	if(isset($_GET[$key])){
 		return $_GET[$key];
 	}else if(isset($default_value)){
@@ -25,7 +25,7 @@ function getQuery($key,$default_value = NULL){
  * @return mixed 
  * @author by Xiao 2014-12-10
  */
-function getPost($key,$default_value = NULL){
+function getPost($key,$default_value = null){
 	if(isset($_POST[$key])){
 		return $_POST[$key];
 	}else if(isset($default_value)){
@@ -43,7 +43,7 @@ function getPost($key,$default_value = NULL){
  * @return mixed 
  * @author by Xiao 2014-12-10
  */
-function getParam($key,$default_value = NULL){
+function getParam($key,$default_value = null){
 	if(isset($_REQUEST[$key])){
 		return $_REQUEST[$key];
 	}else if(isset($default_value)){
