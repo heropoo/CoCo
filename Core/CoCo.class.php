@@ -1,5 +1,4 @@
 <?php
-
 /**
  * CoCo核心类
  * @author TTT
@@ -45,17 +44,24 @@ class CoCo
 
 
         $router = !empty(CoCo::app()->config['router']) ? CoCo::app()->config['router'] : 'normal';
+        //TODO router
         //pathinfo
         if($router == 'pathinfo'){
             $request_uri = $_SERVER['REQUEST_URI'];
             if(!empty(CoCo::app()->config['url_suffix'])){
+                //TODO 去掉尾缀
                 $request_uri = str_replace(CoCo::app()->config['url_suffix'], '', $request_uri);
             }
             $request_uri = ltrim($request_uri,'/');
             $request_uri_arr = explode('/', $request_uri);
-            $request['module']      = !empty($request_uri_arr[0])                   ? ucfirst($request_uri_arr[0]) : ucfirst($default_module);
-            $request['controller']  = !empty($request_uri_arr[1])                   ? ucfirst($request_uri_arr[1]) : ucfirst($default_controller);
-            $request['action']      = 'action' . (!empty($request_uri_arr[2])       ? ucfirst($request_uri_arr[2]) : ucfirst($default_action));
+
+            if(!empty($request_uri) && strpos('index.php', $request_uri) === 0){
+                $request = self::normalUrl($default_module, $default_controller, $default_action);
+            }else{
+                $request['module']      = !empty($request_uri_arr[0])                   ? ucfirst($request_uri_arr[0]) : ucfirst($default_module);
+                $request['controller']  = !empty($request_uri_arr[1])                   ? ucfirst($request_uri_arr[1]) : ucfirst($default_controller);
+                $request['action']      = 'action' . (!empty($request_uri_arr[2])       ? ucfirst($request_uri_arr[2]) : ucfirst($default_action));
+            }
             
             $arr_count = count($request_uri_arr);
             //把参数放入get
@@ -69,10 +75,7 @@ class CoCo
                 }
             }
         }else{ //normal
-            //普通url模式访问 ?m=home&c=index&a=index&id=12312
-            $request['module']      = !empty($_GET['m'])                ? ucfirst($_GET['m']) : $default_module;
-            $request['controller']  = !empty($_GET['c'])                ? ucfirst($_GET['c']) : $default_controller;
-            $request['action']      = 'action' . (!empty($_GET['a'])    ? ucfirst($_GET['a']) : $default_action);
+           $request = self::normalUrl($default_module, $default_controller, $default_action);
         }
 
         /*unset($_GET['m']);
@@ -104,6 +107,14 @@ class CoCo
         //运行结束时间
         $GLOBALS['CoCo_endTime'] = microtime(TRUE);
         //var_dump($GLOBALS['CoCo_endTime'] - $GLOBALS['CoCo_beginTime']);
+    }
+
+     //普通url模式访问 ?m=home&c=index&a=index&id=12312
+    public static function normalUrl($default_module, $default_controller, $default_action){
+        $request['module']      = !empty($_GET['m'])                ? ucfirst($_GET['m']) : $default_module;
+        $request['controller']  = !empty($_GET['c'])                ? ucfirst($_GET['c']) : $default_controller;
+        $request['action']      = 'action' . (!empty($_GET['a'])    ? ucfirst($_GET['a']) : $default_action);
+        return $request;
     }
 
     /**
