@@ -34,15 +34,12 @@ class EDB{
 			$dsn = $this->dbConfig['type'].':host='.$this->dbConfig['host'].';port='.$this->dbConfig['port'].';dbname='.$this->dbConfig['dbname'];
 		}
 
-		//$username = $this->dbConfig['user'];
-		//$password = $this->dbConfig['password'];
-
 		if(is_null($options)){
 			$options = array(
             	PDO::ATTR_AUTOCOMMIT=>0,                    //是否关闭自动提交
             	//PDO::ATTR_ERRMODE=>PDO::ERRMODE_SILENT,   //对错误 沉默
             	//PDO::ATTR_ERRMODE=>PDO::ERRMODE_WARNING,  //对错误 警告
-            	PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,  //对错误 异常
+            	PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION   //对错误 异常
         	);	
 		}
 
@@ -50,8 +47,7 @@ class EDB{
 			//self::$_db = new PDO($dsn,$username,$password,$options);
 			self::$_db = new PDO($dsn,$this->dbConfig['user'],$this->dbConfig['password'],$options);
 		}catch(Exception $e){
-			echo '连接错误：'.$e->getMessage();
-	        exit;
+			die('DB Connect Error:'.$e->getMessage());
 		}
 	}
 

@@ -6,9 +6,11 @@
 class CoController{
 
     protected $layout = '/main';    //布局文件 默认mian
-    protected $title = '';
+    protected $title = '';          //title
     protected $controller;          //当前控制器
     protected $module;              //当前模块
+    protected $css = '';            //css
+    protected $js = '';             //js
 
     public function __construct(){
         $controller = get_class($this);
@@ -206,23 +208,92 @@ class CoController{
     }
 
     /**
+     * 获取get方法提交的值
+     * @param string $key $_GET参数, mixed $default_value 没有值时给予默认值
+     * @return mixed 
+     * @author by Xiao 2014-12-10
+     */
+    public function getQuery($key,$default_value = null){
+        if(isset($_GET[$key])){
+            return $_GET[$key];
+        }else if(isset($default_value)){
+            return $default_value;
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * 获取post方法提交的值
+     * @param string $key $_POST参数, mixed $default_value 没有值时给予默认值
+     * @return mixed 
+     * @author by Xiao 2014-12-10
+     */
+    public function getPost($key,$default_value = null){
+        if(isset($_POST[$key])){
+            return $_POST[$key];
+        }else if(isset($default_value)){
+            return $default_value;
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * $_REQUEST 默认情况下包含了 $_GET，$_POST 和 $_COOKIE 的数组 
+     * （这个数组的项目及其顺序依赖于 PHP 的 variables_order 指令的配置。）
+     * 不建议使用
+     * @param string $key $_REQUEST参数, mixed $default_value 没有值时给予默认值
+     * @return mixed 
+     * @author by Xiao 2014-12-10
+     */
+    public function getParam($key,$default_value = null){
+        if(isset($_REQUEST[$key])){
+            return $_REQUEST[$key];
+        }else if(isset($default_value)){
+            return $default_value;
+        }else{
+            return null;
+        }
+    }
+
+    /**
      * 定义 title
      */
-    public function setTitle(){
-        
+    public function setTitle($title = ''){
+        $this->title = $title;
     }
 
     /**
      * 添加css文件
      */
     public function addCss(){
-
+        $args =func_get_args();
+        if(!empty($args) && is_array($args)){
+            foreach ($args as $k => $v) {
+                $filename = PUBLIC_PATH.'/'.$v.'.css';
+                if(file_exists($filename)){
+                    $this->css .= PHP_EOL.'<link rel="stylesheet" type="text/css" href="'.$filename.'">';
+                }    
+            }
+        }
     }
 
     /**
      * 添加js文件
      */
     public function addJs(){
-
+        $args =func_get_args();
+        if(!empty($args) && is_array($args)){
+            foreach ($args as $k => $v) {
+                $filename = PUBLIC_PATH.'/'.$v.'.js';
+                if(file_exists($filename)){
+                    $this->js .= PHP_EOL.'<script type="text/javascript" src="'.$filename.'"></script>">';
+                }    
+            }
+        }
+        
     }
+
+    //TODO自动加载js css进去
 }
