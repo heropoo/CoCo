@@ -6,9 +6,11 @@
 class CoController{
 
     protected $layout = '/main';    //布局文件 默认mian
-    protected $title = '';
+    protected $title = '';          //title
     protected $controller;          //当前控制器
     protected $module;              //当前模块
+    protected $css = '';            //css
+    protected $js = '';             //js
 
     public function __construct(){
         $controller = get_class($this);
@@ -258,21 +260,40 @@ class CoController{
     /**
      * 定义 title
      */
-    public function setTitle(){
-        
+    public function setTitle($title = ''){
+        $this->title = $title;
     }
 
     /**
      * 添加css文件
      */
     public function addCss(){
-
+        $args =func_get_args();
+        if(!empty($args) && is_array($args)){
+            foreach ($args as $k => $v) {
+                $filename = PUBLIC_PATH.'/'.$v.'.css';
+                if(file_exists($filename)){
+                    $this->css .= PHP_EOL.'<link rel="stylesheet" type="text/css" href="'.$filename.'">';
+                }    
+            }
+        }
     }
 
     /**
      * 添加js文件
      */
     public function addJs(){
-
+        $args =func_get_args();
+        if(!empty($args) && is_array($args)){
+            foreach ($args as $k => $v) {
+                $filename = PUBLIC_PATH.'/'.$v.'.js';
+                if(file_exists($filename)){
+                    $this->js .= PHP_EOL.'<script type="text/javascript" src="'.$filename.'"></script>">';
+                }    
+            }
+        }
+        
     }
+
+    //TODO自动加载js css进去
 }
